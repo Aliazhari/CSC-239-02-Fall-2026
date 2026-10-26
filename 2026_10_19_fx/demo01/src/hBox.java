@@ -1,0 +1,6 @@
+/**
+ * hBox
+ */
+public class hBox {
+
+}

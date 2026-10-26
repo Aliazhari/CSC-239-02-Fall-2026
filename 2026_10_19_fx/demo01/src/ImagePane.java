@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,6 +9,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -15,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class ImagePane extends Application{
+    int times = 0;
   
     public static void main(String[] args) {
         launch(args);
@@ -22,6 +25,7 @@ public class ImagePane extends Application{
 
     @Override
     public void start(Stage stage) {
+        
 
         // Main container
         Pane pane = new Pane();
@@ -49,8 +53,8 @@ public class ImagePane extends Application{
             Font.font("Arial", 30)
         );
         bannerTitle.setTextFill(Color.BLACK);
-        bannerTitle.setLayoutX(235);
-        bannerTitle.setLayoutY(165);
+        bannerTitle.setLayoutX(215);
+        bannerTitle.setLayoutY(205);
 
         Label bannerSubtitle =
             new Label("Your gateway to success");
@@ -80,10 +84,17 @@ public class ImagePane extends Application{
 
         // 6. Password field
         Label passwordLabel = new Label("Password");
-        PasswordField passwordField =
-            new PasswordField();
+        PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter your password");
         passwordField.setPrefHeight(40);
+
+        TextField visiblePassword = new TextField();
+        visiblePassword.setPromptText("Enter password");
+        visiblePassword.setPrefHeight(40);
+        visiblePassword.setManaged(false);
+        visiblePassword.setVisible(false);
+
+        
 
         // 7. Login button
         Button loginButton = new Button("Login");
@@ -104,9 +115,10 @@ public class ImagePane extends Application{
             Color.web("#DC2626")
         );
 
-      
-        loginButton.setOnAction(event -> {
+        class Handler implements EventHandler {
 
+            @Override
+            public void handle(Event arg0) {
             String username =
                 usernameField.getText().trim();
 
@@ -129,7 +141,38 @@ public class ImagePane extends Application{
                     "Login form submitted!"
                 );
             }
+        }
+
+        }
+
+      
+        loginButton.setOnAction(x -> {
+
+            String username =
+                usernameField.getText().trim();
+
+            String password =
+                passwordField.getText();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                statusLabel.setText(
+                    "Please enter both fields."
+                );
+
+            } else {
+                statusLabel.setTextFill(
+                    Color.web("#15803D")
+                );
+
+                statusLabel.setText(
+                    "Login form submitted!"
+                );
+            }
         });
+
+        Label showPass = new Label("\nShow");
+        HBox hBox  = new HBox(2);
+        hBox.getChildren().addAll(passwordField, visiblePassword, showPass);
 
         // 9. Arrange form controls vertically
         VBox form = new VBox(10);
@@ -144,7 +187,7 @@ public class ImagePane extends Application{
             usernameLabel,
             usernameField,
             passwordLabel,
-            passwordField,
+            hBox,
             loginButton,
             statusLabel
         );
@@ -159,6 +202,44 @@ public class ImagePane extends Application{
             bannerSubtitle,
             form
         );
+
+        showPass.setOnMousePressed(event -> {
+            boolean show = true;
+            visiblePassword.setText(passwordField.getText());
+            passwordField.setVisible(!show);
+            passwordField.setManaged(!show);
+
+            visiblePassword.setVisible(show);
+            visiblePassword.setManaged(show);
+            
+        });
+
+        usernameField.setOnKeyPressed(event -> {
+            System.out.println(event.getCode());
+        }
+
+        );
+   
+        passwordField.setOnKeyTyped( event -> {
+            System.out.println(event.getSource());
+        
+            String s = passwordField.getText();
+            //  statusLabel.setText( "Key presses " + s.charAt(0));
+            if ( (s.charAt(0) < 'A') || (s.charAt(0) > 'z')) 
+                statusLabel.setText("Invalid password: " + s.charAt(0));
+            else
+                statusLabel.setText("Valid: " + s.charAt(0));
+            });
+
+        showPass.setOnMouseClicked(event -> {
+            boolean show = false;
+            passwordField.setVisible(!show);
+            passwordField.setManaged(!show);
+
+            visiblePassword.setVisible(show);
+            visiblePassword.setManaged(show);
+            
+        });
 
         Scene scene = new Scene(pane, 600, 600);
 
